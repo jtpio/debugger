@@ -1,10 +1,5 @@
-# Python package
-# Create and test a Python package on multiple Python versions.
-# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/python
-
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-16.04'
 strategy:
   matrix:
     Python:
@@ -14,22 +9,24 @@ steps:
 - bash: echo "##vso[task.prependpath]$CONDA/bin"
   displayName: Add conda to PATH
 
-- bash: conda create --yes --quiet --name jupyterlab-debugger -c conda-forge nodejs xeus-python ptvsd python=$PYTHON_VERSION
+- bash: conda create --yes --quiet --name jupyterlab-debugger
   displayName: Create Anaconda environment
 
 - bash: |
-    source activate jupyterlab-debugger
-    pip install -U --pre jupyterlab
-  displayName: Install JupyterLab 1.1a
+    conda activate jupyterlab-debugger
+    conda install --yes --quiet -c conda-forge nodejs xeus-python ptvsd python=$PYTHON_VERSION
+    python -m pip install -U --pre jupyterlab
+  displayName: Install dependencies
 
 - bash: |
-    source activate jupyterlab-debugger
+    conda activate jupyterlab-debugger
     jlpm
     jlpm run build
     jupyter labextension link .
   displayName: Build jupyterlab-debugger
 
 - bash: |
-    source activate jupyterlab-debugger
+    conda activate jupyterlab-debugger
+    jupyter lab --version
     jlpm run test
   displayName: Run the tests
