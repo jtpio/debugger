@@ -14,7 +14,7 @@ steps:
 - bash: echo "##vso[task.prependpath]$CONDA/bin"
   displayName: Add conda to PATH
 
-- bash: conda create --yes --quiet --name jupyterlab-debugger -c conda-forge jupyterlab nodejs xeus-python ptvsd
+- bash: conda create --yes --quiet --name jupyterlab-debugger -c conda-forge nodejs xeus-python ptvsd python=$PYTHON_VERSION
   displayName: Create Anaconda environment
 
 - bash: |
