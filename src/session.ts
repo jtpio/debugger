@@ -97,7 +97,7 @@ export class DebugSession implements IDebugger.ISession {
    * Request code execution.
    */
   execute(code: string): void {
-    void this._sendExecuteMessage({ code });
+    this._sendExecuteMessage({ code });
   }
 
   /**
@@ -161,15 +161,11 @@ export class DebugSession implements IDebugger.ISession {
    * Send an execute request message to the kernel.
    * @param msg execute request message to send to the kernel.
    */
-  private async _sendExecuteMessage(
+  private _sendExecuteMessage(
     msg: KernelMessage.IExecuteRequestMsg['content']
-  ): Promise<void> {
+  ): void {
     const kernel = this.client.kernel;
-    if (this._executeFuture) {
-      this._executeFuture.dispose();
-    }
-    this._executeFuture = kernel.requestExecute(msg);
-    this._executeFuture.onReply = (msg: KernelMessage.IExecuteReplyMsg) => {};
+    kernel.requestExecute(msg);
   }
 
   private _disposed = new Signal<this, void>(this);

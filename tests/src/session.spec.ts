@@ -137,6 +137,8 @@ describe('protocol', () => {
     });
     await debugSession.sendRequest('configurationDone', {});
     debugSession.execute(code);
+    debugSession.execute(code);
+    debugSession.execute(code);
   });
 
   afterEach(async () => {
