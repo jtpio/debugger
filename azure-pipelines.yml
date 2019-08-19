@@ -23,15 +23,13 @@ steps:
     mkdir ~/.jupyter
     jlpm
     jlpm run build
-    jupyter labextension link .
   displayName: Build jupyterlab-debugger
 
 - bash: |
     source activate jupyterlab-debugger
     jupyter lab --version
     jupyter kernelspec list
+    jupyter --paths
     export XEUS_LOG=1
-    conda list
-    python -m pip list
     jlpm run test
   displayName: Run the tests
