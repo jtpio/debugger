@@ -5,7 +5,7 @@ import { expect } from 'chai';
 
 import { ClientSession, IClientSession } from '@jupyterlab/apputils';
 
-import { createClientSession, sleep } from '@jupyterlab/testutils';
+import { createClientSession } from '@jupyterlab/testutils';
 
 import { find } from '@phosphor/algorithm';
 
