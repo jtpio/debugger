@@ -33,5 +33,6 @@ steps:
 - bash: |
     conda activate jupyterlab-debugger
     jupyter lab --version
+    jupyter kernelspec list
     jlpm run test
   displayName: Run the tests
