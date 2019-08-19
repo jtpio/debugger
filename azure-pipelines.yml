@@ -9,8 +9,11 @@ steps:
 - bash: echo "##vso[task.prependpath]$CONDA/bin"
   displayName: Add conda to PATH
 
+- bash: conda update conda --yes --quiet
+  displayName: Update conda
+
 - bash: conda create --yes --quiet --name jupyterlab-debugger
-  displayName: Create Anaconda environment
+  displayName: Create a new conda environment
 
 - bash: |
     conda activate jupyterlab-debugger
