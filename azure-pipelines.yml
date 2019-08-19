@@ -9,29 +9,24 @@ steps:
 - bash: echo "##vso[task.prependpath]$CONDA/bin"
   displayName: Add conda to PATH
 
-- bash: |
-    conda update conda --yes --quiet
-    conda init bash
-  displayName: Update conda
-
 - bash: conda create --yes --quiet --name jupyterlab-debugger
   displayName: Create a new conda environment
 
 - bash: |
-    conda activate jupyterlab-debugger
+    source activate jupyterlab-debugger
     conda install --yes --quiet -c conda-forge nodejs xeus-python ptvsd python=$PYTHON_VERSION
     python -m pip install -U --pre jupyterlab
   displayName: Install dependencies
 
 - bash: |
-    conda activate jupyterlab-debugger
+    source activate jupyterlab-debugger
     jlpm
     jlpm run build
     jupyter labextension link .
   displayName: Build jupyterlab-debugger
 
 - bash: |
-    conda activate jupyterlab-debugger
+    source activate jupyterlab-debugger
     jupyter lab --version
     jupyter kernelspec list
     jlpm run test
