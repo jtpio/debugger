@@ -27,9 +27,7 @@ steps:
 
 - bash: |
     source activate jupyterlab-debugger
-    jupyter lab --version
-    jupyter kernelspec list
-    jupyter --paths
+    export JUPYTER_PATH=${CONDA_PREFIX}/share/jupyter
     export XEUS_LOG=1
     jlpm run test
   displayName: Run the tests
