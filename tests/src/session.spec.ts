@@ -139,9 +139,6 @@ describe('protocol', () => {
     });
     await debugSession.sendRequest('configurationDone', {});
     void debugSession.execute(code);
-
-    // TODO: handle events instead
-    await sleep(2000);
   });
 
   afterEach(async () => {
