@@ -7,8 +7,6 @@ import { ClientSession, IClientSession } from '@jupyterlab/apputils';
 
 import { createClientSession } from '@jupyterlab/testutils';
 
-import { find } from '@phosphor/algorithm';
-
 import { DebugProtocol } from 'vscode-debugprotocol';
 
 import { IDebugger } from '../../lib/tokens';
@@ -154,49 +152,6 @@ describe('protocol', () => {
         threadId
       });
       expect(reply.success).to.be.true;
-      const stackFrames = reply.body.stackFrames;
-      expect(stackFrames.length).to.equal(2);
-      const frame = stackFrames[0];
-      // first breakpoint
-      expect(frame.line).to.equal(3);
-    });
-  });
-
-  describe('#scopes', () => {
-    it('should return the correct scopes', async () => {
-      const stackFramesReply = await debugSession.sendRequest('stackTrace', {
-        threadId
-      });
-      const frameId = stackFramesReply.body.stackFrames[0].id;
-      const scopesReply = await debugSession.sendRequest('scopes', {
-        frameId
-      });
-      const scopes = scopesReply.body.scopes;
-      expect(scopes.length).to.equal(1);
-      expect(scopes[0].name).to.equal('Locals');
-    });
-  });
-
-  describe('#variablesReference', () => {
-    it('should return the variables and their values', async () => {
-      const stackFramesReply = await debugSession.sendRequest('stackTrace', {
-        threadId
-      });
-      const frameId = stackFramesReply.body.stackFrames[0].id;
-      const scopesReply = await debugSession.sendRequest('scopes', {
-        frameId
-      });
-      const scopes = scopesReply.body.scopes;
-      const variablesReference = scopes[0].variablesReference;
-      const variablesReply = await debugSession.sendRequest('variables', {
-        variablesReference
-      });
-      const variables = variablesReply.body.variables;
-      expect(variables.length).to.be.greaterThan(0);
-      const i = find(variables, variable => variable.name === 'i');
-      expect(i).to.exist;
-      expect(i.type).to.equal('int');
-      expect(i.value).to.equal('1');
     });
   });
 });
