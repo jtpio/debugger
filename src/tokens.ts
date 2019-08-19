@@ -55,7 +55,7 @@ export namespace IDebugger {
     /**
      * Send a request to execute code.
      */
-    execute(code: string): Promise<void>;
+    execute(code: string): void;
   }
 
   export namespace ISession {

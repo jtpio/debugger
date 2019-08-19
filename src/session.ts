@@ -96,7 +96,7 @@ export class DebugSession implements IDebugger.ISession {
   /**
    * Request code execution.
    */
-  async execute(code: string): Promise<void> {
+  execute(code: string): void {
     void this._sendExecuteMessage({ code });
   }
 
