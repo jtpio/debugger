@@ -1,9 +1,11 @@
 pool:
   vmImage: 'ubuntu-16.04'
+
 strategy:
   matrix:
-    Python:
+    Tests:
       python.version: '3.7'
+      testResultsFiles: 'tests/**/junit.xml'
 
 steps:
 - bash: echo "##vso[task.prependpath]$CONDA/bin"
@@ -20,7 +22,6 @@ steps:
 
 - bash: |
     source activate jupyterlab-debugger
-    mkdir ~/.jupyter
     jlpm
     jlpm run build
   displayName: Build jupyterlab-debugger
@@ -31,3 +32,10 @@ steps:
     export XEUS_LOG=1
     jlpm run test
   displayName: Run the tests
+- task: PublishTestResults@2
+  displayName: 'Publish test results'
+  condition: variables['testResultsFiles']
+  inputs:
+    testResultsFiles: '$(testResultsFiles)'
+    testRunTitle: '$(group)'
+    mergeTestResults: true
