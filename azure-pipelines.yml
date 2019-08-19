@@ -28,3 +28,8 @@ steps:
     jlpm run build
     jupyter labextension link .
   displayName: Build jupyterlab-debugger
+
+- bash: |
+    source activate jupyterlab-debugger
+    jlpm run test
+  displayName: Run the tests
