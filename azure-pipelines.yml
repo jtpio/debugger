@@ -20,6 +20,7 @@ steps:
 
 - bash: |
     source activate jupyterlab-debugger
+    mkdir ~/.jupyter
     jlpm
     jlpm run build
     jupyter labextension link .
