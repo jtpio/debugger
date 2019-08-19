@@ -19,7 +19,7 @@ steps:
 
 - bash: |
     source activate jupyterlab-debugger
-    python -m pip install -U --pre jupyterlab
+    pip install -U --pre jupyterlab
   displayName: Install JupyterLab 1.1a
 
 - bash: |
