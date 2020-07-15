@@ -15,7 +15,7 @@ import {
   WidgetTracker
 } from '@jupyterlab/apputils';
 
-import { IEditorServices } from '@jupyterlab/codeeditor';
+import { IEditorServices, CodeEditorWrapper } from '@jupyterlab/codeeditor';
 
 import { ConsolePanel, IConsoleTracker } from '@jupyterlab/console';
 
@@ -50,7 +50,14 @@ import { DebuggerHandler } from './handler';
 
 import { DebuggerModel } from './model';
 
-import { IDebugger, IDebuggerConfig, IDebuggerEditorFinder } from './tokens';
+import { SourcesTracker } from './sources-tracker';
+
+import {
+  IDebugger,
+  IDebuggerConfig,
+  IDebuggerEditorFinder,
+  IDebuggerReadOnlyEditorTracker
+} from './tokens';
 
 import { VariablesBodyGrid } from './variables/grid';
 
@@ -244,21 +251,49 @@ const notebooks: JupyterFrontEndPlugin<void> = {
 };
 
 /**
- * A plugin that tracks notebook, console and file editors used for debugging.
+ * A plugin that tracks sources in read only editors.
+ */
+const sources: JupyterFrontEndPlugin<IDebuggerReadOnlyEditorTracker> = {
+  id: '@jupyterlab/debugger:sources',
+  autoStart: true,
+  provides: IDebuggerReadOnlyEditorTracker,
+  requires: [IDebugger, IEditorServices, IDebuggerEditorFinder],
+  optional: [IDebuggerEditorFinder],
+  activate: (
+    app: JupyterFrontEnd,
+    debuggerService: IDebugger,
+    editorServices: IEditorServices,
+    editorFinder: IDebugger.IEditorFinder
+  ): IDebuggerReadOnlyEditorTracker => {
+    const tracker = new WidgetTracker<MainAreaWidget<CodeEditorWrapper>>({
+      namespace: '@jupyterlab/debugger'
+    });
+
+    new SourcesTracker({
+      shell: app.shell,
+      debuggerService,
+      editorServices,
+      editorFinder,
+      readOnlyEditorTracker: tracker
+    });
+
+    return tracker;
+  }
+};
+
+/**
+ * A plugin that styles notebook, console and file editors used for debugging.
  */
 const tracker: JupyterFrontEndPlugin<void> = {
   id: '@jupyterlab/debugger:tracker',
   autoStart: true,
-  requires: [IDebugger, IEditorServices, IDebuggerEditorFinder],
+  requires: [IDebugger, IDebuggerEditorFinder],
   activate: (
     app: JupyterFrontEnd,
     debug: IDebugger,
-    editorServices: IEditorServices,
     editorFinder: IDebugger.IEditorFinder
   ) => {
     new TrackerHandler({
-      shell: app.shell,
-      editorServices,
       debuggerService: debug,
       editorFinder
     });
@@ -303,14 +338,20 @@ const finder: JupyterFrontEndPlugin<IDebugger.IEditorFinder> = {
   autoStart: true,
   provides: IDebuggerEditorFinder,
   requires: [IDebuggerConfig, IEditorServices],
-  optional: [INotebookTracker, IConsoleTracker, IEditorTracker],
+  optional: [
+    INotebookTracker,
+    IConsoleTracker,
+    IEditorTracker,
+    IDebuggerReadOnlyEditorTracker
+  ],
   activate: (
     app: JupyterFrontEnd,
     config: IDebugger.IConfig,
     editorServices: IEditorServices,
     notebookTracker: INotebookTracker | null,
     consoleTracker: IConsoleTracker | null,
-    editorTracker: IEditorTracker | null
+    editorTracker: IEditorTracker | null,
+    readOnlyEditorTracker: IDebuggerReadOnlyEditorTracker | null
   ): IDebugger.IEditorFinder => {
     return new EditorFinder({
       config,
@@ -318,10 +359,12 @@ const finder: JupyterFrontEndPlugin<IDebugger.IEditorFinder> = {
       editorServices,
       notebookTracker,
       consoleTracker,
-      editorTracker
+      editorTracker,
+      readOnlyEditorTracker
     });
   }
 };
+
 /*
  * A plugin to open detailed views for variables.
  */
@@ -571,6 +614,7 @@ const plugins: JupyterFrontEndPlugin<any>[] = [
   consoles,
   files,
   notebooks,
+  sources,
   tracker,
   variables,
   main,

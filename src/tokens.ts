@@ -1,7 +1,9 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
-import { CodeEditor } from '@jupyterlab/codeeditor';
+import { MainAreaWidget, IWidgetTracker } from '@jupyterlab/apputils';
+
+import { CodeEditor, CodeEditorWrapper } from '@jupyterlab/codeeditor';
 
 import { KernelMessage, Session } from '@jupyterlab/services';
 
@@ -509,3 +511,17 @@ export const IDebuggerConfig = new Token<IDebugger.IConfig>(
 export const IDebuggerEditorFinder = new Token<IDebugger.IEditorFinder>(
   '@jupyterlab/debugger:editor-finder'
 );
+
+/**
+ * A class that tracks read only editor widgets used for debugging.
+ */
+export type IDebuggerReadOnlyEditorTracker = IWidgetTracker<
+  MainAreaWidget<CodeEditorWrapper>
+>;
+
+/**
+ * The Debugger Read Only Editor tracker token.
+ */
+export const IDebuggerReadOnlyEditorTracker = new Token<
+  IDebuggerReadOnlyEditorTracker
+>('@jupyterlab/debugger:read-only-editor-tracker');

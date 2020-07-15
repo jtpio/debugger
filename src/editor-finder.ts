@@ -3,13 +3,7 @@
 
 import { JupyterFrontEnd } from '@jupyterlab/application';
 
-import { MainAreaWidget, WidgetTracker } from '@jupyterlab/apputils';
-
-import {
-  CodeEditor,
-  CodeEditorWrapper,
-  IEditorServices
-} from '@jupyterlab/codeeditor';
+import { CodeEditor, IEditorServices } from '@jupyterlab/codeeditor';
 
 import { IConsoleTracker } from '@jupyterlab/console';
 
@@ -19,7 +13,7 @@ import { INotebookTracker } from '@jupyterlab/notebook';
 
 import { chain, each, IIterator } from '@lumino/algorithm';
 
-import { IDebugger } from './tokens';
+import { IDebugger, IDebuggerReadOnlyEditorTracker } from './tokens';
 
 /**
  * A class to find instances of code editors across notebook, console and files widgets
@@ -36,9 +30,7 @@ export class EditorFinder implements IDebugger.IEditorFinder {
     this._notebookTracker = options.notebookTracker;
     this._consoleTracker = options.consoleTracker;
     this._editorTracker = options.editorTracker;
-    this._readOnlyEditorTracker = new WidgetTracker<
-      MainAreaWidget<CodeEditorWrapper>
-    >({ namespace: '@jupyterlab/debugger' });
+    this._readOnlyEditorTracker = options.readOnlyEditorTracker;
   }
 
   /**
@@ -187,6 +179,10 @@ export class EditorFinder implements IDebugger.IEditorFinder {
   private _findInReadOnlyEditors(
     params: IDebugger.IEditorFinder.Params
   ): CodeEditor.IEditor[] {
+    if (!this._readOnlyEditorTracker) {
+      return;
+    }
+
     const { focus, kernel, source } = params;
 
     const editors: CodeEditor.IEditor[] = [];
@@ -208,15 +204,13 @@ export class EditorFinder implements IDebugger.IEditorFinder {
     });
     return editors;
   }
-  private _shell: JupyterFrontEnd.IShell;
-  private _readOnlyEditorTracker: WidgetTracker<
-    MainAreaWidget<CodeEditorWrapper>
-  >;
 
+  private _shell: JupyterFrontEnd.IShell;
   private _config: IDebugger.IConfig;
   private _notebookTracker: INotebookTracker | null;
   private _consoleTracker: IConsoleTracker | null;
   private _editorTracker: IEditorTracker | null;
+  private _readOnlyEditorTracker: IDebuggerReadOnlyEditorTracker;
 }
 /**
  * A namespace for editor finder statics.
@@ -242,9 +236,14 @@ export namespace EditorFinder {
     editorServices: IEditorServices;
 
     /**
-     * An optional editor finder for file editors.
+     * An optional tracker for file editors.
      */
     editorTracker?: IEditorTracker;
+
+    /**
+     * An optional tracker for read-only file editors.
+     */
+    readOnlyEditorTracker?: IDebuggerReadOnlyEditorTracker;
 
     /**
      * An optional editor finder for notebooks.
